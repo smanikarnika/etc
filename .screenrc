@@ -1,0 +1,32 @@
+# VARIABLES
+# ===============================================================
+
+# Don't display the copyright page
+  startup_message off			# default: on
+
+# Change default scrollback value for new windows
+  defscrollback 4096			# default: 100
+
+# shell:  Default process started in screen's windows.
+# Makes it possible to use a different shell inside screen
+# than is set as the default login shell.
+# If begins with a '-' character, the shell will be started as a login shell.
+  shell -$SHELL
+
+# No annoying visual bell
+  vbell off
+
+# Uses nethack-style messages
+  nethack on				# default: off
+
+# Affects the copying of text regions
+  crlf off				# default: off
+
+# display the name of the running command in the window title
+ shelltitle '$ |dev'
+
+# Useful captioning
+#
+
+caption always "%?%{gk}%-Lw%?%{yb}%n*%f %t%?(%u)%?%?%{bk}%+Lw%? %72=%{b y} %Y-%m-%d | %c | Load: %l %{wk}"
+hardstatus alwayslastline 

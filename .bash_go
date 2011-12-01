@@ -1,0 +1,78 @@
+export GO_DIR=$HOME/.go
+
+function go() {
+    if [ "x$1" == "x-h" ]; then
+        echo "Usage:  "
+        echo "  go_where                                   # will list all the resgistered directory aliases and their full paths"
+        echo "  go_add <alias> <dir_path>                  # will register an alias to a directory"
+        echo "  go_remove <alias>                          # will unregister an alias created using go_add"
+        echo "  go [<alias>|<dir_path>|<any_cd_argument>]  # will cd into the aliased directory if it was registered, or the dir_path"
+        echo "NOTE: using 'go' instead of 'cd' will "
+        echo "       - source the 'activate' script when entering a python virtualenv directory"
+        echo "       - execute 'deactivate' when exiting a python virtualenv directory"
+        echo ""
+        return 0
+    fi
+    go_dir $*
+}
+
+function _go_dir() {
+    go_file=$GO_DIR/$1
+    if [ -f $go_file ]; then
+        dir=`cat $go_file`
+    else
+        dir=$1
+    fi
+    echo $dir
+}
+
+function go_dir() {
+    dir=`_go_dir $1`
+    cd $dir
+    if [ ! -t 1 ]; then
+        echo $dir
+    fi
+}
+
+function go_where() {
+    head -v $GO_DIR/*
+}
+
+function go_add() {
+    echo "$2" > $GO_DIR/$1
+    _go_set $*
+}
+
+function go_remove() {
+    rm $GO_DIR/$1
+    _go_unset $*
+}
+
+function _go_list() {
+    find $GO_DIR/ -type f | xargs -L 1 basename
+}
+
+function _go_comp() {
+    local curw
+    COMPREPLY=()
+    curw=${COMP_WORDS[COMP_CWORD]}
+    COMPREPLY=($(compgen -W '`_go_list`' -- $curw))
+    return 0
+}
+
+function _go_set() {
+    export go_$1=`_go_dir $1`
+}
+
+function _go_unset() {
+    unset go_$1
+}
+
+mkdir -p $GO_DIR
+
+for i in `_go_list`; do
+    _go_set $i;
+done
+
+complete -o filenames -F _go_comp go
+complete -o filenames -F _go_comp go_remove
